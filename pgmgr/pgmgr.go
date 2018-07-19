@@ -447,6 +447,10 @@ func sqlConnectionString(c *Config) string {
 		args = append(args, " password='", c.Password, "'")
 	}
 
+	if c.MigrationSchema != "" {
+		args = append(args, " currentSchema='", c.MigrationSchema, "'")
+	}
+
 	args = append(args,
 		" host='", c.Host, "'",
 		" port=", c.Port,

@@ -24,13 +24,14 @@ type argumentContext interface {
 // Config stores the options used by pgmgr.
 type Config struct {
 	// connection
-	Username string
-	Password string
-	Database string
-	Host     string
-	Port     int
-	URL      string
-	SslMode  string
+	Username        string
+	Password        string
+	Database        string
+	Host            string
+	Port            int
+	URL             string
+	SslMode         string
+	MigrationSchema string
 
 	// filepaths
 	DumpFile        string `json:"dump-file"`
@@ -98,6 +99,9 @@ func (config *Config) populateFromPostgresVars() {
 	if os.Getenv("PGSSLMODE") != "" {
 		config.SslMode = os.Getenv("PGSSLMODE")
 	}
+	if os.Getenv("PGMIGRATIONSCHEMA") != "" {
+		config.MigrationSchema = os.Getenv("PGMIGRATIONSCHEMA")
+	}
 }
 
 func (config *Config) applyDefaults() {
@@ -118,6 +122,9 @@ func (config *Config) applyDefaults() {
 	}
 	if config.SslMode == "" {
 		config.SslMode = "disable"
+	}
+	if config.MigrationSchema == "" {
+		config.MigrationSchema = "public"
 	}
 }
 
@@ -143,12 +150,19 @@ func (config *Config) applyArguments(ctx argumentContext) {
 	if ctx.String("sslmode") != "" {
 		config.SslMode = ctx.String("sslmode")
 	}
+	if ctx.String("migration-schema") != "" {
+		config.MigrationSchema = ctx.String("migration-schema")
+	}
 	if ctx.String("dump-file") != "" {
 		config.DumpFile = ctx.String("dump-file")
 	}
 	if ctx.String("migration-folder") != "" {
 		config.MigrationFolder = ctx.String("migration-folder")
 	}
+	if ctx.String("migration-schema") != "" {
+		config.MigrationSchema = ctx.String("migration-schema")
+	}
+
 	if ctx.StringSlice("seed-tables") != nil && len(ctx.StringSlice("seed-tables")) > 0 {
 		config.SeedTables = ctx.StringSlice("seed-tables")
 	}
